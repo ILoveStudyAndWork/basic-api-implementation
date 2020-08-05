@@ -93,7 +93,7 @@ class UserControllerTest {
                 .andExpect(header().string("index","0"))
                 .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/user/list"))
+        mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(1)))
                 .andExpect(jsonPath("$[0].user_name",is("abc")))
