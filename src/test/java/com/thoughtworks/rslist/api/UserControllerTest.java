@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -81,6 +82,28 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+
+    @Test
+    void get_user_list() throws Exception {
+        User user = new User("abc","male",20,"abc@abc.com","18978654567",10);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(user);
+
+        mockMvc.perform(post("/user").content(json).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index","0"))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/user/list"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",hasSize(1)))
+                .andExpect(jsonPath("$[0].user_name",is("abc")))
+                .andExpect(jsonPath("$[0].user_age",is(20)))
+                .andExpect(jsonPath("$[0].user_gender",is("male")))
+                .andExpect(jsonPath("$[0].user_email",is("abc@abc.com")))
+                .andExpect(jsonPath("$[0].user_phone",is("18978654567")));
+
+
+    }
 
 
 }

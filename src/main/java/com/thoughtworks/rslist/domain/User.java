@@ -6,18 +6,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.*;
 
 public class User {
+    @JsonProperty("user_name")
     @NotNull
     @Size(max = 8)
     private String userName;
+
+    @JsonProperty("user_gender")
     @NotNull
     private String gender;
+
+    @JsonProperty("user_age")
     @NotNull
     @Max(100)
     @Min(18)
     private int age;
+
+    @JsonProperty("user_email")
     @NotNull
     @Email
     private String email;
+
+    @JsonProperty("user_phone")
     @NotNull
     @Pattern(regexp = "^1\\d{10}")
     private String phone;
