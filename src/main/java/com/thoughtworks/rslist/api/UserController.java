@@ -20,7 +20,7 @@ public class UserController {
         userList.add(user);
         return ResponseEntity.created(null).build();
     }
-    @GetMapping("/userList")
+    @GetMapping("/user/list")
     public ResponseEntity getUserList(){
         return ResponseEntity.ok(userList);
     }
