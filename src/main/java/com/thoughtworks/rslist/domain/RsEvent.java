@@ -4,11 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+
+;
 
 public class RsEvent {
-    String keyWord;
-    String eventName;
     @Valid
+    @NotNull(message = "keyWord cannot be null")
+    String keyWord;
+
+    @Valid
+    @NotNull(message = "eventName cannot be null")
+    String eventName;
+
+    @Valid
+    @NotNull(message = "user cannot be null")
     User user;
 
     @JsonIgnore

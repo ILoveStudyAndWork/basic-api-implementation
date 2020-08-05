@@ -216,4 +216,33 @@ class RsControllerTest {
                 .andExpect(jsonPath("$",hasSize(2)));
     }
 
+    @Test
+    void should_throw_error_when_rs_name_is_empty() throws Exception {
+        //difference between null and ""
+        String eventJson =  "{\"keyWord\":\"天气\",\"user\": {\"userName\":\"reporter\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
+        mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
+    }
+    @Test
+    void should_throw_error_when_rs_keyword_is_empty() throws Exception {
+        //difference between null and ""
+        String eventJson =  "{\"eventName\":\"广东台风\",\"keyWord\":\"\",\"user\": {\"userName\":\"reporter\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
+        mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
+
+    }
+
+    @Test
+    void should_throw_error_when_user_is_empty() throws Exception {
+        //difference between null and ""
+        String eventJson =  "{\"eventName\":\"广东台风\",\"keyWord\":\"天气\"}}";
+        mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
+
+    }
+
+
 }

@@ -6,7 +6,9 @@ import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
+import com.thoughtworks.rslist.valid.Validate1;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +37,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) throws Exception {
+  public ResponseEntity addRsEvent(@RequestBody @Validated RsEvent rsEvent) throws Exception {
     User user = rsEvent.getUser();
     if (!UserController.userList.contains(user)){
         UserController.userList.add(user);
