@@ -43,7 +43,8 @@ public class RsController {
         UserController.userList.add(user);
     }
     rsList.add(rsEvent);
-    return ResponseEntity.created(null).build();
+    String indexToString = Integer.toString(rsList.size()-1);
+    return ResponseEntity.created(null).header("index",indexToString).build();
   }
 
   @PostMapping("/rs/modify")
@@ -58,7 +59,8 @@ public class RsController {
       eventToBeModify.setKeyWord(rsEvent.getKeyWord());
     }
 
-    return ResponseEntity.ok().build();
+    String indexToString = Integer.toString(order-1);
+    return ResponseEntity.created(null).header("index",indexToString).build();
   }
 
   @GetMapping("/rs/delete")

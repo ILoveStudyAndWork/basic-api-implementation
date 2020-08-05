@@ -2,6 +2,7 @@ package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -11,12 +12,13 @@ import org.springframework.mock.http.client.MockClientHttpRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,6 +27,10 @@ class UserControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    @BeforeEach
+    void setUp(){
+        UserController.userList = new ArrayList<>();
+    }
     @Test
     void should_register_user() throws Exception {
         //String jsonUser = "{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\",\"user\": {\"userName\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
@@ -33,6 +39,7 @@ class UserControllerTest {
         String json = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post("/user").content(json).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("index","0"))
                 .andExpect(status().isCreated());
     }
 

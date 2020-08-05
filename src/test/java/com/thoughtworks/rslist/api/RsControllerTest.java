@@ -100,7 +100,8 @@ class RsControllerTest {
         String addEvent = objectMapper.writeValueAsString(rsEvent);
 
         mockMvc.perform(post("/rs/event").content(addEvent).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("index","3"));
 
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
@@ -122,7 +123,8 @@ class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String addEvent = objectMapper.writeValueAsString(rsEvent);
         mockMvc.perform(post("/rs/modify?order=1").content(addEvent).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("index","0"));
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(3)))
@@ -137,7 +139,8 @@ class RsControllerTest {
         RsEvent rsEventEnt = new RsEvent(null,"乘风破浪的姐姐开播",user);
         String addEventEnt = objectMapper.writeValueAsString(rsEventEnt);
         mockMvc.perform(post("/rs/modify?order=2").content(addEventEnt).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("index","1"));
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(3)))
@@ -151,7 +154,8 @@ class RsControllerTest {
         RsEvent rsEventTech = new RsEvent("科技",null,user);
         String addEventTech = objectMapper.writeValueAsString(rsEventTech);
         mockMvc.perform(post("/rs/modify?order=3").content(addEventTech).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(header().string("index","2"));
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(3)))
