@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
 import com.thoughtworks.rslist.exception.Error;
+import com.thoughtworks.rslist.exception.RequestNotValidException;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.valid.Validate1;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
@@ -31,6 +33,9 @@ public class RsController {
   @GetMapping("/rs/list")
   public ResponseEntity getRsEvent(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
     if (start != null && end != null){
+        if (start < 1 || end > rsList.size() - 1){
+          throw new RequestNotValidException("invalid request param");
+        }
       return ResponseEntity.ok(rsList.subList(start-1,end));
     }
     return ResponseEntity.ok(rsList);
@@ -68,6 +73,7 @@ public class RsController {
     rsList.remove(rsList.get(order-1));
     return ResponseEntity.ok().build();
   }
+
 
 
 

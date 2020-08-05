@@ -252,5 +252,11 @@ class RsControllerTest {
 
     }
 
+    @Test
+    void should_throw_error_when_given_invalid_request_param() throws Exception {
+        mockMvc.perform(get("/rs/list?start=0&end=3"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid request param")));
+    }
 
 }
