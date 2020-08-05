@@ -3,42 +3,41 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
+import com.thoughtworks.rslist.exception.Error;
+import com.thoughtworks.rslist.exception.RsEventNotValidException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import java.util.ArrayList;
+
+import javax.validation.Valid;
 import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
 
 @RestController
 public class RsController {
-  private List<RsEvent> rsList = initRsEvent();
-
-  public List<RsEvent> initRsEvent(){
-    List<RsEvent> rsEvent = new ArrayList<>();
-    rsEvent.add(new RsEvent("无标签","第一条事件"));
-    rsEvent.add(new RsEvent("无标签","第二条事件"));
-    rsEvent.add(new RsEvent("无标签","第三条事件"));
-    return rsEvent;
-  }
-
-
+  public static List<RsEvent> rsList;
 
   @GetMapping("/rs/{index}")
-  public RsEvent getRsEvent(@PathVariable int index){
-    return rsList.get(index-1);
+  public ResponseEntity getRsEvent(@PathVariable int index){
+    if (index < 1 || index > rsList.size()){
+          throw new RsEventNotValidException("invalid index");
+    }
+    return ResponseEntity.ok(rsList.get(index-1));
   }
 
   @GetMapping("/rs/list")
-  public List<RsEvent> getRsEvent(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
+  public ResponseEntity getRsEvent(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
     if (start != null && end != null){
-      return rsList.subList(start-1,end);
+      return ResponseEntity.ok(rsList.subList(start-1,end));
     }
-    return rsList;
+    return ResponseEntity.ok(rsList);
   }
 
   @PostMapping("/rs/event")
-  public void addRsEvent(@RequestBody String json) throws JsonProcessingException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    RsEvent rsEvent = objectMapper.readValue(json,RsEvent.class);
+  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) throws Exception {
+
     rsList.add(rsEvent);
+    return ResponseEntity.created(null).build();
   }
 
   @PostMapping("/rs/modify")
@@ -58,4 +57,21 @@ public class RsController {
   public void addRsEvent(@RequestParam Integer order) throws Exception {
     rsList.remove(rsList.get(order-1));
   }
+
+
+
+  @ExceptionHandler({RsEventNotValidException.class, MethodArgumentNotValidException.class})
+  public ResponseEntity rsEventNotValidExceptionHandler(Exception e){
+      String errorMessage;
+      if (e instanceof RsEventNotValidException){
+          errorMessage = e.getMessage();
+      } else {
+          errorMessage = "invalid user";
+      }
+
+      Error error = new Error();
+      error.setError(errorMessage);
+      return ResponseEntity.badRequest().body(error);
+  }
+
 }
