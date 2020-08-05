@@ -30,11 +30,14 @@ class RsControllerTest {
     void setUp(){
 
         RsController.rsList = new ArrayList<>();
+
         User user = new User("abc","male",20,"abc@abc.com","18978654567",10);
         RsController.rsList.add(new RsEvent("无标签","第一条事件",user));
         RsController.rsList.add(new RsEvent("无标签","第二条事件",user));
         RsController.rsList.add(new RsEvent("无标签","第三条事件",user));
 
+        UserController.userList = new ArrayList<>();
+        UserController.userList.add(user);
 
     }
 
@@ -185,7 +188,7 @@ class RsControllerTest {
     @Test
     void should_throw_exception_when_user_not_valid() throws Exception {
         //why can't de-serialization success?
-        String eventJson =  "{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\",\"user\": {\"userName\":\"xyxiainvalid\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
+        String eventJson =  "{\"eventName\":\"什么肉都涨价了\",\"keyWord\":\"经济\",\"user\": {\"userName\":\"xyxiainvalid\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
 
 
         mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
@@ -193,5 +196,24 @@ class RsControllerTest {
                 .andExpect(jsonPath("$.error",is("invalid user")));
     }
 
+    @Test
+    void should_add_user_to_user_list_if_user_not_exist_yet() throws Exception {
+        String eventJson =  "{\"eventName\":\"牛肉涨价了\",\"keyWord\":\"经济\",\"user\": {\"userName\":\"newUser\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
+        mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        mockMvc.perform(get("/userList"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",hasKey(2)));
+    }
+
+    @Test
+    void should_add_not_add_user_to_usr_list_if_user_exist() throws Exception {
+        String eventJson =  "{\"eventName\":\"口罩降价了\",\"keyWord\":\"经济\",\"user\": {\"userName\":\"abc\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
+        mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        mockMvc.perform(get("/userList"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",hasKey(2)));
+    }
 
 }

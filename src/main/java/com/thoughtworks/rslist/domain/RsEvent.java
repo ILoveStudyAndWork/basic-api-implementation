@@ -28,10 +28,6 @@ public class RsEvent {
         this.user = user;
     }
 
-//    public RsEvent(String keyWord, String eventName) {
-//        this.keyWord = keyWord;
-//        this.eventName = eventName;
-//    }
     public String getKeyWord() {
         return keyWord;
     }
