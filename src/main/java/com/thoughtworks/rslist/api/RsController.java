@@ -60,17 +60,5 @@ public class RsController {
 
 
 
-  @ExceptionHandler({RsEventNotValidException.class, MethodArgumentNotValidException.class})
-  public ResponseEntity rsEventNotValidExceptionHandler(Exception e){
-      String errorMessage;
-      if (e instanceof RsEventNotValidException){
-          errorMessage = e.getMessage();
-      } else {
-          errorMessage = "invalid user";
-      }
-      Error error = new Error();
-      error.setError(errorMessage);
-      return ResponseEntity.badRequest().body(error);
-  }
 
 }
