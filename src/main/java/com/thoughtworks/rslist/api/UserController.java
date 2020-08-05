@@ -18,9 +18,10 @@ public class UserController {
     //@ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity registerUser(@RequestBody @Valid User user){
         userList.add(user);
-        return ResponseEntity.created(null).build();
+        String indexToString = Integer.toString(userList.size()-1);
+        return ResponseEntity.created(null).header("index",indexToString).build();
     }
-    @GetMapping("/user/list")
+    @GetMapping("/users")
     public ResponseEntity getUserList(){
         return ResponseEntity.ok(userList);
     }

@@ -15,7 +15,7 @@ public class RsEventExceptionHandler {
         if (e instanceof RsEventNotValidException){
             errorMessage = e.getMessage();
         } else {
-            errorMessage = "invalid user";
+            errorMessage = "invalid rsEvent";
         }
         Error error = new Error();
         error.setError(errorMessage);

@@ -43,11 +43,12 @@ public class RsController {
         UserController.userList.add(user);
     }
     rsList.add(rsEvent);
-    return ResponseEntity.created(null).build();
+    String indexToString = Integer.toString(rsList.size()-1);
+    return ResponseEntity.created(null).header("index",indexToString).build();
   }
 
   @PostMapping("/rs/modify")
-  public void modifyRsEvent(@RequestBody String json,@RequestParam Integer order) throws JsonProcessingException {
+  public ResponseEntity modifyRsEvent(@RequestBody String json,@RequestParam Integer order) throws JsonProcessingException {
     RsEvent eventToBeModify = rsList.get(order-1);
     ObjectMapper objectMapper = new ObjectMapper();
     RsEvent rsEvent = objectMapper.readValue(json,RsEvent.class);
@@ -57,11 +58,15 @@ public class RsController {
     if (rsEvent.getKeyWord() != null){
       eventToBeModify.setKeyWord(rsEvent.getKeyWord());
     }
+
+    String indexToString = Integer.toString(order-1);
+    return ResponseEntity.created(null).header("index",indexToString).build();
   }
 
   @GetMapping("/rs/delete")
-  public void addRsEvent(@RequestParam Integer order) throws Exception {
+  public ResponseEntity addRsEvent(@RequestParam Integer order) throws Exception {
     rsList.remove(rsList.get(order-1));
+    return ResponseEntity.ok().build();
   }
 
 
