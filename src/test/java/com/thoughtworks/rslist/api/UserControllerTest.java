@@ -51,7 +51,8 @@ class UserControllerTest {
         String json = objectMapper.writeValueAsString(user);
 
         mockMvc.perform(post("/user").content(json).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error",is("invalid user")));
     }
     @Test
     void age_should_between_18_and_100() throws Exception {

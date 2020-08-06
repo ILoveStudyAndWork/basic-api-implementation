@@ -34,7 +34,7 @@ public class RsController {
   @GetMapping("/rs/list")
   public ResponseEntity getRsEvent(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
     if (start != null && end != null){
-        if (start < 1 || end > rsList.size() - 1){
+        if (start < 1 || end > rsList.size()){
           throw new RequestNotValidException("invalid request param");
         }
       return ResponseEntity.ok(rsList.subList(start-1,end));
@@ -43,7 +43,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@RequestBody @Validated(Validate.class) RsEvent rsEvent) throws Exception{
+  public ResponseEntity addRsEvent(@RequestBody @Valid RsEvent rsEvent) throws Exception{
     User user = rsEvent.getUser();
     if (!UserController.userList.contains(user)){
         UserController.userList.add(user);

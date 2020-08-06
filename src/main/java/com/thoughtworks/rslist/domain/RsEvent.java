@@ -12,15 +12,14 @@ import javax.validation.constraints.NotNull;
 
 public class RsEvent {
 
-    @NotNull(message = "invalid param",groups = {Validate1.class})
+    @NotNull
     String keyWord;
 
-
-    @NotNull(message = "invalid param",groups = {Validate1.class})
+    @NotNull
     String eventName;
 
-    @NotNull(message = "invalid param",groups = {Validate1.class})
     @Valid
+    @NotNull
     User user;
 
     @JsonIgnore
