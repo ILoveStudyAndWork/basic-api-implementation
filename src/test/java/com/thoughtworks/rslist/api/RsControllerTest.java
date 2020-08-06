@@ -201,7 +201,7 @@ class RsControllerTest {
 
         mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error",is("invalid rsEvent")));
+                .andExpect(jsonPath("$.error",is("invalid user")));
     }
 
     @Test
@@ -230,7 +230,7 @@ class RsControllerTest {
         String eventJson =  "{\"keyWord\":\"天气\",\"user\": {\"userName\":\"reporter\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
         mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error",is("invalid rsEvent")));
+                .andExpect(jsonPath("$.error",is("invalid param")));
     }
     @Test
     void should_throw_error_when_rs_keyword_is_empty() throws Exception {
@@ -238,7 +238,7 @@ class RsControllerTest {
         String eventJson =  "{\"eventName\":\"广东台风\",\"keyWord\":\"\",\"user\": {\"userName\":\"reporter\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
         mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error",is("invalid rsEvent")));
+                .andExpect(jsonPath("$.error",is("invalid param")));
 
     }
 
@@ -248,7 +248,7 @@ class RsControllerTest {
         String eventJson =  "{\"eventName\":\"广东台风\",\"keyWord\":\"天气\"}}";
         mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error",is("invalid rsEvent")));
+                .andExpect(jsonPath("$.error",is("invalid param")));
 
     }
 
@@ -258,5 +258,6 @@ class RsControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error",is("invalid request param")));
     }
+
 
 }

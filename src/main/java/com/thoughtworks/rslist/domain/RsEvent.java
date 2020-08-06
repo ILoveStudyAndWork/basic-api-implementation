@@ -2,23 +2,25 @@ package com.thoughtworks.rslist.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thoughtworks.rslist.valid.Validate1;
+import com.thoughtworks.rslist.valid.Validate2;
 
+import javax.validation.GroupSequence;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-;
 
 public class RsEvent {
-    @Valid
-    @NotNull(message = "keyWord cannot be null")
+
+    @NotNull(message = "invalid param",groups = {Validate1.class})
     String keyWord;
 
-    @Valid
-    @NotNull(message = "eventName cannot be null")
+
+    @NotNull(message = "invalid param",groups = {Validate1.class})
     String eventName;
 
+    @NotNull(message = "invalid param",groups = {Validate1.class})
     @Valid
-    @NotNull(message = "user cannot be null")
     User user;
 
     @JsonIgnore

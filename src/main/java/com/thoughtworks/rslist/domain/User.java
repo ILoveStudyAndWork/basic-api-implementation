@@ -2,32 +2,33 @@ package com.thoughtworks.rslist.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.thoughtworks.rslist.valid.Validate2;
 
 import javax.validation.constraints.*;
 
 public class User {
     @JsonProperty("user_name")
-    @NotNull
+    @NotNull(groups = Validate2.class)
     @Size(max = 8)
     private String userName;
 
     @JsonProperty("user_gender")
-    @NotNull
+    @NotNull(groups = Validate2.class)
     private String gender;
 
     @JsonProperty("user_age")
-    @NotNull
+    @NotNull(groups = Validate2.class)
     @Max(100)
     @Min(18)
     private int age;
 
     @JsonProperty("user_email")
-    @NotNull
+    @NotNull(groups = Validate2.class)
     @Email
     private String email;
 
     @JsonProperty("user_phone")
-    @NotNull
+    @NotNull(groups = Validate2.class)
     @Pattern(regexp = "^1\\d{10}")
     private String phone;
     private int voteNum;
