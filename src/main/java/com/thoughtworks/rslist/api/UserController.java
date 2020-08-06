@@ -39,6 +39,8 @@ public class UserController {
 //        userList.add(user);
         //String indexToString = Integer.toString(userList.size()-1);
         //return ResponseEntity.created(null).header("index",indexToString).build();
+
+        System.out.println(userRepository.findById(Integer.valueOf(1)).toString());
         return ResponseEntity.created(null).build();
     }
     @GetMapping("/users")
@@ -48,9 +50,10 @@ public class UserController {
     }
 
     @GetMapping("/user/delete")
-    public ResponseEntity deleteUserById(@RequestParam String userId){
-        userRepository.deleteById(Integer.valueOf(userId));
+    public ResponseEntity deleteUserById(@RequestParam int userId){
 
+        System.out.println(userRepository.findById(Integer.valueOf(userId)).toString());
+        userRepository.deleteById(Integer.valueOf(userId));
         return ResponseEntity.created(null).build();
     }
 

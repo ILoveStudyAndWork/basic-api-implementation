@@ -73,18 +73,14 @@ class UserControllerTest {
                 .voteNum(10)
                 .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(userDto);
-        mockMvc.perform(post("/user").content(json).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
+        userRepository.save(userDto);
+
         mockMvc.perform(get("/users")
                 .param("userId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userName", is("xiaoming")))
                 .andExpect(jsonPath("$.userId", is(1)));
     }
-
-
     @Test
     void should_delete_user_by_id() throws Exception {
         UserDto userDto = UserDto.builder()
@@ -95,12 +91,7 @@ class UserControllerTest {
                 .phone("19876545676")
                 .voteNum(10)
                 .build();
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(userDto);
-        mockMvc.perform(post("/user").content(json).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-
+        userRepository.save(userDto);
         mockMvc.perform(get("/user/delete")
                 .param("userId", "1"))
                 .andExpect(status().isCreated());
