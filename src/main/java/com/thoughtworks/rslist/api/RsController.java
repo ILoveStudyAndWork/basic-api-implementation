@@ -82,6 +82,7 @@ public class RsController {
 
     Map<String, String> map = new ObjectMapper().readValue(jsonEvent, Map.class);
     String eventName = map.get("eventName");
+
     String keyword = map.get("keyword");
     String userId = map.get("userId");
     if (userId == null){
@@ -91,6 +92,14 @@ public class RsController {
     Optional<RsEventDto> rsEventDtoToBePatch = rsEventRepository.findById(rsEventId);
     if (rsEventDtoToBePatch.isPresent()) {
       int userIdInRsEvent = rsEventDtoToBePatch.get().getUserDto().getUserId();
+      String eventNameInRsEvent = rsEventDtoToBePatch.get().getEventName();
+      String keyWordInRsEvent = rsEventDtoToBePatch.get().getKeyWord();
+      if (eventName == null){
+        eventName = eventNameInRsEvent;
+      }
+      if (keyword == null){
+        keyword = keyWordInRsEvent;
+      }
       if (userIdInRsEvent == Integer.valueOf(userId)) {
         //update
         RsEventDto rsEventDto = RsEventDto.builder()
@@ -132,7 +141,6 @@ public class RsController {
     rsList.remove(rsList.get(order-1));
     return ResponseEntity.ok().build();
   }
-
 
 
 

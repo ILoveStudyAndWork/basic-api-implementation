@@ -37,16 +37,13 @@ class RsControllerTest {
     @Autowired
     RsEventRepository rsEventRepository;
 
+    UserDto userDto;
 
     @BeforeEach
     void setUp(){
         userRepository.deleteAll();
         rsEventRepository.deleteAll();
-
-    }
-    @Test
-    void should_add_rs_event_when_user_id_valid() throws Exception {
-        UserDto userDto = UserDto.builder()
+        userDto = UserDto.builder()
                 .userName("xiaoming")
                 .age(20)
                 .email("a@b.com")
@@ -54,6 +51,11 @@ class RsControllerTest {
                 .phone("19876545676")
                 .voteNum(10)
                 .build();
+
+    }
+    @Test
+    void should_add_rs_event_when_user_id_valid() throws Exception {
+
         userRepository.save(userDto);
 
         RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
@@ -70,14 +72,6 @@ class RsControllerTest {
     }
     @Test
     void should_return_bad_request_if_user_not_exist_when_add_rs_event() throws Exception {
-        UserDto userDto = UserDto.builder()
-                .userName("xiaoming")
-                .age(20)
-                .email("a@b.com")
-                .gender("male")
-                .phone("19876545676")
-                .voteNum(10)
-                .build();
         RsEventDto rsEventDtoUserNotExist = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
         String jsonUserNotExist = new ObjectMapper().writeValueAsString(rsEventDtoUserNotExist);
         mockMvc.perform(post("/rs/event").content(jsonUserNotExist).contentType(MediaType.APPLICATION_JSON))
@@ -89,14 +83,6 @@ class RsControllerTest {
 
     @Test
     void should_update_rs_event() throws Exception {
-        UserDto userDto = UserDto.builder()
-                .userName("xiaoming")
-                .age(20)
-                .email("a@b.com")
-                .gender("male")
-                .phone("19876545676")
-                .voteNum(10)
-                .build();
         userRepository.save(userDto);
 
         RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
@@ -113,14 +99,6 @@ class RsControllerTest {
 
     @Test
     void should_return_bad_request_when_send_no_event_id_to_update_rs_event() throws Exception {
-        UserDto userDto = UserDto.builder()
-                .userName("xiaoming")
-                .age(20)
-                .email("a@b.com")
-                .gender("male")
-                .phone("19876545676")
-                .voteNum(10)
-                .build();
         userRepository.save(userDto);
 
         RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
@@ -130,6 +108,27 @@ class RsControllerTest {
         mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+    @Test
+    void should_only_update_the_param_not_null_in_request_body_when_update_event() throws Exception {
+        userRepository.save(userDto);
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        rsEventRepository.save(rsEventDto);
+        String jsonUpDateKeyWord = "{\"keyword\":\"娱乐\",\"userId\":\"1\"}";
+        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonUpDateKeyWord).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
+        assertEquals(1,rsEventDtoList.size());
+        assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
+
+        String jsonUpDateEventName = "{\"eventName\":\"乘风破浪的姐姐更新\",\"userId\":\"1\"}";
+        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonUpDateEventName).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+        rsEventDtoList = rsEventRepository.findAll();
+        assertEquals(1,rsEventDtoList.size());
+        assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
+        assertEquals("乘风破浪的姐姐更新", rsEventDtoList.get(0).getEventName());
+    }
+
     @Test
     public void get_rs_event_list() throws Exception {
         mockMvc.perform(get("/rs/list"))
