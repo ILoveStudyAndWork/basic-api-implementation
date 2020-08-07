@@ -24,24 +24,16 @@ public class UserController {
 
 
     @RequestMapping("/user")
-    public ResponseEntity registerUser(@RequestBody @Valid User user){
-        UserDto userDto = UserDto.builder()
-                .userName(user.getUserName())
-                .age(user.getAge())
-                .email(user.getEmail())
-                .gender(user.getGender())
-                .phone(user.getPhone())
-                .voteNum(user.getVoteNum())
-                .build();
-        userRepository.save(userDto);
+    public ResponseEntity registerUser(@RequestBody  UserDto userDto){
+        Optional<UserDto> userDtoOptional = userRepository.findById(userDto.getUserId());
+        if (!userDtoOptional.isPresent()){
+            userRepository.save(userDto);
+            return ResponseEntity.created(null).build();
+        }else {
+            return ResponseEntity.badRequest().build();
+        }
 
 
-//        userList.add(user);
-        //String indexToString = Integer.toString(userList.size()-1);
-        //return ResponseEntity.created(null).header("index",indexToString).build();
-
-        System.out.println(userRepository.findById(Integer.valueOf(1)).toString());
-        return ResponseEntity.created(null).build();
     }
     @GetMapping("/users")
     public ResponseEntity getUserList(@RequestParam String userId){
@@ -49,12 +41,16 @@ public class UserController {
         return ResponseEntity.ok(userDto);
     }
 
-    @GetMapping("/user/delete")
-    public ResponseEntity deleteUserById(@RequestParam int userId){
+    @GetMapping("/user/{id}")
+    public ResponseEntity deleteUserById(@PathVariable int id){
+        Optional<UserDto> userDtoOptional = userRepository.findById(id);
+        if (userDtoOptional.isPresent()){
+            userRepository.deleteById(id);
+            return ResponseEntity.created(null).build();
+        }else {
+            return ResponseEntity.badRequest().build();
+        }
 
-        System.out.println(userRepository.findById(Integer.valueOf(userId)).toString());
-        userRepository.deleteById(Integer.valueOf(userId));
-        return ResponseEntity.created(null).build();
     }
 
 }

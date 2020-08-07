@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
 @RestController
@@ -54,7 +56,7 @@ public class RsController {
   @PostMapping("/rs/event")
   public ResponseEntity addRsEvent(@RequestBody  RsEventDto rsEventDto) throws Exception{
     //find if the user exist
-    if (userRepository.findById(rsEventDto.getUserId()).isPresent()){
+    if (userRepository.findById(rsEventDto.getUserDto().getUserId()).isPresent()){
       rsEventRepository.save(rsEventDto);
       return ResponseEntity.created(null).build();
     }else
@@ -72,6 +74,41 @@ public class RsController {
 //    String indexToString = Integer.toString(rsList.size()-1);
 //    return ResponseEntity.created(null).header("index",indexToString).build();
 //  }
+
+
+  @PatchMapping("/rs/{rsEventId}")
+  public ResponseEntity patchRsEvent(@PathVariable int rsEventId
+                                    ,@RequestBody String jsonEvent) throws JsonProcessingException {
+
+    Map<String, String> map = new ObjectMapper().readValue(jsonEvent, Map.class);
+    String eventName = map.get("eventName");
+    String keyword = map.get("keyword");
+    String userId = map.get("userId");
+    if (userId == null){
+      return ResponseEntity.badRequest().build();
+    }
+    //read the userId by rsEvent
+    Optional<RsEventDto> rsEventDtoToBePatch = rsEventRepository.findById(rsEventId);
+    if (rsEventDtoToBePatch.isPresent()) {
+      int userIdInRsEvent = rsEventDtoToBePatch.get().getUserDto().getUserId();
+      if (userIdInRsEvent == Integer.valueOf(userId)) {
+        //update
+        RsEventDto rsEventDto = RsEventDto.builder()
+                .eventName(eventName)
+                .keyWord(keyword)
+                .rsEventId(2)
+                .userDto(rsEventDtoToBePatch
+                        .get()
+                        .getUserDto())
+                .build();
+        rsEventRepository.save(rsEventDto);
+        return ResponseEntity.created(null).build();
+      }
+    }
+      return ResponseEntity.created(null).build();
+
+  }
+
 
 
   @PostMapping("/rs/modify")

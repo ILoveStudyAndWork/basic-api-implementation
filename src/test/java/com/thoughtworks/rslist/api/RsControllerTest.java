@@ -21,8 +21,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
@@ -42,23 +41,11 @@ class RsControllerTest {
     @BeforeEach
     void setUp(){
         userRepository.deleteAll();
-
-
-//
-//        RsController.rsList = new ArrayList<>();
-//
-//        User user = new User("abc","male",20,"abc@abc.com","18978654567",10);
-//        RsController.rsList.add(new RsEvent("无标签","第一条事件",user));
-//        RsController.rsList.add(new RsEvent("无标签","第二条事件",user));
-//        RsController.rsList.add(new RsEvent("无标签","第三条事件",user));
-//        UserController.userList = new ArrayList<>();
-//        UserController.userList.add(user);
+        rsEventRepository.deleteAll();
 
     }
-
     @Test
-    void should_return_bad_request_if_user_not_exist_when_add_rs_event() throws Exception {
-
+    void should_add_rs_event_when_user_id_valid() throws Exception {
         UserDto userDto = UserDto.builder()
                 .userName("xiaoming")
                 .age(20)
@@ -69,32 +56,79 @@ class RsControllerTest {
                 .build();
         userRepository.save(userDto);
 
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userId(1).build();
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
         String jsonValue = new ObjectMapper().writeValueAsString(rsEventDto);
         mockMvc.perform(post("/rs/event").content(jsonValue).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        List<UserDto> userDtoList = userRepository.findAll();
-        assertEquals(1,userDtoList.size());
-        assertEquals("xiaoming",userDtoList.get(0).getUserName());
-        assertEquals("a@b.com",userDtoList.get(0).getEmail());
-        assertEquals("male",userDtoList.get(0).getGender());
-        assertEquals(10,userDtoList.get(0).getVoteNum());
-        assertEquals("19876545676",userDtoList.get(0).getPhone());
-        assertEquals(1,userDtoList.get(0).getUserId());
+        List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
+        assertEquals(1, rsEventDtoList.size());
+        assertEquals("龙卷风", rsEventDtoList.get(0).getEventName());
+        assertEquals("天气", rsEventDtoList.get(0).getKeyWord());
 
-        RsEventDto rsEventDtoUserNotExist = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userId(2).build();
+
+    }
+    @Test
+    void should_return_bad_request_if_user_not_exist_when_add_rs_event() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .userName("xiaoming")
+                .age(20)
+                .email("a@b.com")
+                .gender("male")
+                .phone("19876545676")
+                .voteNum(10)
+                .build();
+        RsEventDto rsEventDtoUserNotExist = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
         String jsonUserNotExist = new ObjectMapper().writeValueAsString(rsEventDtoUserNotExist);
         mockMvc.perform(post("/rs/event").content(jsonUserNotExist).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+            List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
+            assertEquals(0, rsEventDtoList.size());
+
     }
 
+    @Test
+    void should_update_rs_event() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .userName("xiaoming")
+                .age(20)
+                .email("a@b.com")
+                .gender("male")
+                .phone("19876545676")
+                .voteNum(10)
+                .build();
+        userRepository.save(userDto);
+
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        rsEventRepository.save(rsEventDto);
+
+        String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\",\"userId\":\"1\"}";
+        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
+        assertEquals(1,rsEventDtoList.size());
+        assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
+    }
 
     @Test
-    void shouldAddUserIfUserNotExist(){
-//
-//        mockMvc.perform(post("rs/list").content().contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(jsonPath("$"),hasSize(1));
+    void should_return_bad_request_when_send_no_event_id_to_update_rs_event() throws Exception {
+        UserDto userDto = UserDto.builder()
+                .userName("xiaoming")
+                .age(20)
+                .email("a@b.com")
+                .gender("male")
+                .phone("19876545676")
+                .voteNum(10)
+                .build();
+        userRepository.save(userDto);
+
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        rsEventRepository.save(rsEventDto);
+
+        String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\"}";
+        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
     @Test
     public void get_rs_event_list() throws Exception {
