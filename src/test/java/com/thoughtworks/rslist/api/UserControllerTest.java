@@ -65,7 +65,7 @@ class UserControllerTest {
         List<UserDto> userList = userRepository.findAll();
         assertEquals(1,userList.size());
         assertEquals("xiaoming",userList.get(0).getUserName());
-        assertEquals(1,userList.get(0).getUserId());
+        assertEquals(1,userList.get(0).getId());
         assertEquals("a@b.com",userList.get(0).getEmail());
     }
 
@@ -114,16 +114,16 @@ class UserControllerTest {
                 .gender("male")
                 .phone("19876545676")
                 .voteNum(10)
-                .userId(1)
+                .id(1)
                 .build();
         userRepository.save(userDto);
         RsEventDto rsEventDto = RsEventDto.builder()
                 .keyWord("人文")
                 .eventName("今天周五啦")
-                .userDto(userDto)
+                .user(userDto)
                 .build();
         rsEventRepository.save(rsEventDto);
-        mockMvc.perform(get("/user/{id}",userDto.getUserId()))
+        mockMvc.perform(get("/user/{id}",userDto.getId()))
                 .andExpect(status().isCreated());
         List<UserDto> userList = userRepository.findAll();
         assertEquals(0,userList.size());

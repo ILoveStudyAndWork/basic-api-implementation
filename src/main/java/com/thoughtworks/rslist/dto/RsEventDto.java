@@ -7,7 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-
+import java.util.List;
+@Table(name = "rs_event")
 @Entity
 @Data
 @Builder
@@ -15,13 +16,15 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class RsEventDto {
     @Id
-    @GeneratedValue
-    private int rsEventId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
     private String keyWord;
-
     private String eventName;
+    private int voteNum;
 
-    //private int userId;
     @ManyToOne(cascade = CascadeType.REMOVE)
-    private UserDto userDto;
+    private UserDto user;
+
+    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "rsEvent")
+    private List<VoteDto> vote;
 }

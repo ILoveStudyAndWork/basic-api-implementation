@@ -18,8 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 public class UserDto {
     @Id
-    @GeneratedValue
-    private int userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
     @Column(name = "name")
     private String userName;
@@ -34,6 +34,9 @@ public class UserDto {
 
     private int voteNum = 10;
 
-    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "userDto")
-    private List<RsEventDto> rsEventDtos;
+    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "user")
+    private List<RsEventDto> rsEvent;
+
+    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "user")
+    private List<VoteDto> vote;
 }

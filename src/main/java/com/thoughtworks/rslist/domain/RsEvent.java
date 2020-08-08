@@ -22,6 +22,8 @@ public class RsEvent {
     @NotNull
     User user;
 
+    int voteNum = 0;
+
     @JsonIgnore
     public User getUser() {
         return user;

@@ -3,27 +3,22 @@ package com.thoughtworks.rslist.api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.domain.RsEvent;
-import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.dto.RsEventDto;
-import com.thoughtworks.rslist.exception.Error;
+import com.thoughtworks.rslist.dto.UserDto;
+import com.thoughtworks.rslist.dto.VoteDto;
 import com.thoughtworks.rslist.exception.RequestNotValidException;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
-import com.thoughtworks.rslist.valid.Validate;
-import com.thoughtworks.rslist.valid.Validate1;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.RejectedExecutionException;
 
 @RestController
 public class RsController {
@@ -33,6 +28,8 @@ public class RsController {
   RsEventRepository rsEventRepository;
   @Autowired
   UserRepository userRepository;
+  @Autowired
+  VoteRepository voteRepository;
 
   @GetMapping("/rs/{index}")
   public ResponseEntity getRsEvent(@PathVariable int index){
@@ -56,7 +53,7 @@ public class RsController {
   @PostMapping("/rs/event")
   public ResponseEntity addRsEvent(@RequestBody  RsEventDto rsEventDto) throws Exception{
     //find if the user exist
-    if (userRepository.findById(rsEventDto.getUserDto().getUserId()).isPresent()){
+    if (userRepository.findById(rsEventDto.getUser().getId()).isPresent()){
       rsEventRepository.save(rsEventDto);
       return ResponseEntity.created(null).build();
     }else
@@ -91,7 +88,7 @@ public class RsController {
     //read the userId by rsEvent
     Optional<RsEventDto> rsEventDtoToBePatch = rsEventRepository.findById(rsEventId);
     if (rsEventDtoToBePatch.isPresent()) {
-      int userIdInRsEvent = rsEventDtoToBePatch.get().getUserDto().getUserId();
+      int userIdInRsEvent = rsEventDtoToBePatch.get().getUser().getId();
       String eventNameInRsEvent = rsEventDtoToBePatch.get().getEventName();
       String keyWordInRsEvent = rsEventDtoToBePatch.get().getKeyWord();
       if (eventName == null){
@@ -105,10 +102,10 @@ public class RsController {
         RsEventDto rsEventDto = RsEventDto.builder()
                 .eventName(eventName)
                 .keyWord(keyword)
-                .rsEventId(2)
-                .userDto(rsEventDtoToBePatch
+                .id(2)
+                .user(rsEventDtoToBePatch
                         .get()
-                        .getUserDto())
+                        .getUser())
                 .build();
         rsEventRepository.save(rsEventDto);
         return ResponseEntity.created(null).build();
@@ -144,5 +141,34 @@ public class RsController {
 
 
 
+  @PostMapping("/rs/vote/{rsEventId}")
+  public ResponseEntity voteWithEventId (@PathVariable int rsEventId, @RequestBody String voteJson) throws Exception {
+    ObjectMapper objectMapper = new ObjectMapper();
+    Vote vote = objectMapper.readValue(voteJson,Vote.class);
+
+    //change vote num in user and rsEvent and their dto
+    Optional<UserDto> userDto = userRepository.findById(vote.getUserId());
+    Optional<RsEventDto> rsEventDto = rsEventRepository.findById(rsEventId);
+    if (userDto.isPresent() && userDto.get().getVoteNum() > vote.getVoteNum() && rsEventDto.isPresent()){
+      UserDto userToBeUpdate = userDto.get();
+      userToBeUpdate.setVoteNum(userDto.get().getVoteNum()-vote.getVoteNum());
+
+      RsEventDto eventToBeUpdate = rsEventDto.get();
+      eventToBeUpdate.setVoteNum(rsEventDto.get().getVoteNum()+vote.getVoteNum());
+
+      VoteDto voteDto = VoteDto.builder()
+              .rsEvent(rsEventDto.get())
+              .user(userDto.get())
+              .voteNum(vote.getVoteNum())
+              .voteTime(vote.getVoteTime())
+              .build();
+      rsEventRepository.save(eventToBeUpdate);
+      userRepository.save(userToBeUpdate);
+      voteRepository.save(voteDto);
+      return ResponseEntity.created(null).build();
+    }else {
+      return ResponseEntity.badRequest().build();
+    }
+  }
 
 }

@@ -25,7 +25,7 @@ public class UserController {
 
     @RequestMapping("/user")
     public ResponseEntity registerUser(@RequestBody  UserDto userDto){
-        Optional<UserDto> userDtoOptional = userRepository.findById(userDto.getUserId());
+        Optional<UserDto> userDtoOptional = userRepository.findById(userDto.getId());
         if (!userDtoOptional.isPresent()){
             userRepository.save(userDto);
             return ResponseEntity.created(null).build();

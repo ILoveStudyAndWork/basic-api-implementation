@@ -5,10 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thoughtworks.rslist.api.RsController;
 import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.User;
+import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.dto.RsEventDto;
 import com.thoughtworks.rslist.dto.UserDto;
+import com.thoughtworks.rslist.dto.VoteDto;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
+import com.thoughtworks.rslist.repository.VoteRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -16,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,12 +41,20 @@ class RsControllerTest {
     @Autowired
     RsEventRepository rsEventRepository;
 
+    @Autowired
+    VoteRepository voteRepository;
+
     UserDto userDto;
+    RsEventDto rsEventDto;
+    RsEventDto rsEventDto1;
+    RsEventDto rsEventDto2;
+    RsEventDto rsEventDto3;
 
     @BeforeEach
     void setUp(){
         userRepository.deleteAll();
         rsEventRepository.deleteAll();
+        voteRepository.deleteAll();
         userDto = UserDto.builder()
                 .userName("xiaoming")
                 .age(20)
@@ -52,13 +64,36 @@ class RsControllerTest {
                 .voteNum(10)
                 .build();
 
+        rsEventDto1 = RsEventDto.builder()
+                .keyWord("无标签")
+                .eventName("第一条事件")
+                .user(userDto)
+                .voteNum(0).build();
+        rsEventDto2 = RsEventDto.builder()
+                .keyWord("无标签")
+                .eventName("第二条事件")
+                .user(userDto)
+                .voteNum(0).build();
+        rsEventDto3 = RsEventDto.builder()
+                .keyWord("无标签")
+                .eventName("第三条事件")
+                .user(userDto)
+                .voteNum(0).build();
+        rsEventDto = RsEventDto.builder()
+                .keyWord("娱乐")
+                .eventName("乘风破浪的姐姐更新了")
+                .user(userDto)
+                .voteNum(100).build();
+        userRepository.save(userDto);
+        rsEventRepository.save(rsEventDto1);
+        rsEventRepository.save(rsEventDto2);
+        rsEventRepository.save(rsEventDto3);
+
     }
     @Test
     void should_add_rs_event_when_user_id_valid() throws Exception {
-
         userRepository.save(userDto);
-
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
         String jsonValue = new ObjectMapper().writeValueAsString(rsEventDto);
         mockMvc.perform(post("/rs/event").content(jsonValue).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
@@ -72,7 +107,7 @@ class RsControllerTest {
     }
     @Test
     void should_return_bad_request_if_user_not_exist_when_add_rs_event() throws Exception {
-        RsEventDto rsEventDtoUserNotExist = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        RsEventDto rsEventDtoUserNotExist = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
         String jsonUserNotExist = new ObjectMapper().writeValueAsString(rsEventDtoUserNotExist);
         mockMvc.perform(post("/rs/event").content(jsonUserNotExist).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
@@ -85,7 +120,7 @@ class RsControllerTest {
     void should_update_rs_event() throws Exception {
         userRepository.save(userDto);
 
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
         rsEventRepository.save(rsEventDto);
 
         String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\",\"userId\":\"1\"}";
@@ -101,7 +136,7 @@ class RsControllerTest {
     void should_return_bad_request_when_send_no_event_id_to_update_rs_event() throws Exception {
         userRepository.save(userDto);
 
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
         rsEventRepository.save(rsEventDto);
 
         String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\"}";
@@ -111,7 +146,7 @@ class RsControllerTest {
     @Test
     void should_only_update_the_param_not_null_in_request_body_when_update_event() throws Exception {
         userRepository.save(userDto);
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").userDto(userDto).build();
+        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
         rsEventRepository.save(rsEventDto);
         String jsonUpDateKeyWord = "{\"keyword\":\"娱乐\",\"userId\":\"1\"}";
         mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonUpDateKeyWord).contentType(MediaType.APPLICATION_JSON))
@@ -136,6 +171,7 @@ class RsControllerTest {
                 .andExpect(jsonPath("$",hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName",is("第一条事件")))
                 .andExpect(jsonPath("$[0].keyWord",is("无标签")))
+                .andExpect(jsonPath("$[0].id",is("1")))
                 .andExpect(jsonPath("$[0]",not(hasKey("user"))))
                 .andExpect(jsonPath("$[1].eventName",is("第二条事件")))
                 .andExpect(jsonPath("$[1].keyWord",is("无标签")))
@@ -351,4 +387,28 @@ class RsControllerTest {
     }
 
 
+    @Test
+    void should_add_vote_record() throws Exception {
+        rsEventRepository.save(rsEventDto);
+        VoteDto voteDto = VoteDto.builder().voteNum(3).voteTime(LocalDateTime.now()).user(userDto).rsEvent(rsEventDto).build();
+        String jsonVote = (new ObjectMapper()).writeValueAsString(Vote.builder()
+                .voteTime(voteDto.getVoteTime())
+                .userId(voteDto.getUser().getId())
+                .voteNum(voteDto.getVoteNum())
+                .build());
+
+        mockMvc.perform(post("/rs/vote/{rsEventId}",rsEventDto.getId())
+                .content(jsonVote)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        //check vote num for rs ,user ,voteD
+        List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
+        assertEquals(103,rsEventDtoList.get(3).getVoteNum());
+        List<UserDto> userDtoList = userRepository.findAll();
+        assertEquals(7,userDtoList.get(0).getVoteNum());
+        List<VoteDto> voteDtoList = voteRepository.findAll();
+        assertEquals(3,voteDtoList.get(0).getVoteNum());
+
+    }
 }
