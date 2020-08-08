@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
 
 @Data
 @Builder
@@ -29,8 +27,9 @@ public class VoteDto {
     private LocalDateTime voteTime;
     private int voteNum;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne//(cascade = CascadeType.REMOVE)
     private UserDto user;
-    @ManyToOne(cascade = CascadeType.REMOVE)
+
+    @ManyToOne//(cascade = CascadeType.REMOVE)
     private RsEventDto rsEvent;
 }

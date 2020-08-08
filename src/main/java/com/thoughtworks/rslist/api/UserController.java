@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 public class UserController {
-    public static List<User> userList;
+    public static List<UserDto> userList;
 
     @Autowired
     UserRepository userRepository;

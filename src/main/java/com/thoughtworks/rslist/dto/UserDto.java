@@ -1,5 +1,6 @@
 package com.thoughtworks.rslist.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.javafx.beans.IDProperty;
 import lombok.AllArgsConstructor;
@@ -34,9 +35,14 @@ public class UserDto {
 
     private int voteNum = 10;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "user")
     private List<RsEventDto> rsEvent;
 
-    @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "user")
+    @JsonIgnore
+    @OneToMany//(cascade = CascadeType.REMOVE,mappedBy = "user")
     private List<VoteDto> vote;
+
+
+
 }
