@@ -7,6 +7,7 @@ import com.thoughtworks.rslist.valid.Validate2;
 
 import javax.validation.GroupSequence;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 

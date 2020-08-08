@@ -35,6 +35,7 @@ public class UserController {
 
 
     }
+
     @GetMapping("/users")
     public ResponseEntity getUserList(@RequestParam String userId){
         Optional<UserDto> userDto = userRepository.findById(Integer.valueOf(userId));

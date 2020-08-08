@@ -48,7 +48,6 @@ class UserControllerTest {
 
     @Test
     void should_register_user() throws Exception {
-        //String jsonUser = "{\"eventName\":\"猪肉涨价了\",\"keyWord\":\"经济\",\"user\": {\"userName\":\"xyxia\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
         UserDto userDto = UserDto.builder()
                 .userName("xiaoming")
                 .age(20)

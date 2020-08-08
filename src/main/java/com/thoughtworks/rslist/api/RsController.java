@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -35,7 +36,7 @@ public class RsController {
   RsEventService rsEventService;
 
   @GetMapping("/rs/{index}")
-  public ResponseEntity getRsEvent(@PathVariable int index){
+  public ResponseEntity getRsEventByIndex(@PathVariable int index){
     if (index < 1 || index > rsEventService.getRsList().size()){
           throw new RsEventNotValidException("invalid index");
     }
@@ -54,8 +55,7 @@ public class RsController {
   }
 
   @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@RequestBody  RsEventDto rsEventDto) throws Exception{
-    //find if the user exist
+  public ResponseEntity addRsEvent(@RequestBody @Valid RsEventDto rsEventDto) throws Exception{
     if (userRepository.findById(rsEventDto.getUser().getId()).isPresent()){
       rsEventRepository.save(rsEventDto);
       return ResponseEntity.created(null).build();
@@ -87,30 +87,6 @@ public class RsController {
       return ResponseEntity.created(null).build();
    }
       return ResponseEntity.created(null).build();
-  }
-
-
-
-  @PostMapping("/rs/modify")
-  public ResponseEntity modifyRsEvent(@RequestBody String json,@RequestParam Integer order) throws JsonProcessingException {
-    RsEventDto eventToBeModify = rsList.get(order-1);
-    ObjectMapper objectMapper = new ObjectMapper();
-    RsEvent rsEvent = objectMapper.readValue(json,RsEvent.class);
-    if (rsEvent.getEventName() != null){
-      eventToBeModify.setEventName(rsEvent.getEventName());
-    }
-    if (rsEvent.getKeyWord() != null){
-      eventToBeModify.setKeyWord(rsEvent.getKeyWord());
-    }
-
-    String indexToString = Integer.toString(order-1);
-    return ResponseEntity.created(null).header("index",indexToString).build();
-  }
-
-  @GetMapping("/rs/delete")
-  public ResponseEntity addRsEvent(@RequestParam Integer order) throws Exception {
-    rsList.remove(rsList.get(order-1));
-    return ResponseEntity.ok().build();
   }
 
 

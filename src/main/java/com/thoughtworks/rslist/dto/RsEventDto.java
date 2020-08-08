@@ -8,6 +8,9 @@ import com.thoughtworks.rslist.domain.User;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 @Table(name = "rs_event")
 @Entity
@@ -17,14 +20,23 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RsEventDto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
+    @NotNull
     private String keyWord;
+
+    @NotNull
     private String eventName;
     private int voteNum;
 
+    @NotNull
+    @Valid
     @JsonBackReference
+    @Getter(onMethod = @__( @JsonIgnore))
+    @Setter(onMethod = @__( @JsonProperty))
     @ManyToOne(cascade = CascadeType.REMOVE)
     private UserDto user;
 
@@ -33,15 +45,7 @@ public class RsEventDto {
     @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "rsEvent")
     private List<VoteDto> vote;
 
-    @JsonProperty
-    public UserDto getUser() {
-        return user;
-    }
 
-    @JsonIgnore
-    public void setUser(UserDto user) {
-        this.user = user;
-    }
 
 
 }
