@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.fasterxml.jackson.databind.MapperFeature.USE_ANNOTATIONS;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.autoconfigure.AutoConfigurationPackages.has;
@@ -48,6 +49,7 @@ class RsControllerTest {
     VoteRepository voteRepository;
 
     UserDto userDto;
+    UserDto userDtoNew;
     RsEventDto rsEventDto;
     RsEventDto rsEventDto1;
     RsEventDto rsEventDto2;
@@ -63,7 +65,14 @@ class RsControllerTest {
                 .phone("19876545676")
                 .voteNum(10)
                 .build();
-
+        userDtoNew = UserDto.builder()
+                .userName("wanwan")
+                .age(30)
+                .email("wanwan@b.com")
+                .gender("female")
+                .phone("19876545676")
+                .voteNum(10)
+                .build();
         rsEventDto1 = RsEventDto.builder()
                 .keyWord("not type")
                 .eventName("The first rs event")
@@ -96,38 +105,44 @@ class RsControllerTest {
         userRepository.deleteAll();
         voteRepository.deleteAll();
     }
-    //objectMapper.configure(USE_ANNOTATIONS, false);
+    //
     @Test
     void should_add_rs_event_when_user_id_valid() throws Exception {
         userRepository.save(userDto);
         RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
-        String jsonValue = new ObjectMapper().writeValueAsString(rsEventDto);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(USE_ANNOTATIONS, false);
+        String jsonValue = objectMapper.writeValueAsString(rsEventDto);
+
         mockMvc.perform(post("/rs/event").content(jsonValue).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(1, rsEventDtoList.size());
-        assertEquals("龙卷风", rsEventDtoList.get(0).getEventName());
-        assertEquals("天气", rsEventDtoList.get(0).getKeyWord());
+        assertEquals(4, rsEventDtoList.size());
+        assertEquals("龙卷风", rsEventDtoList.get(3).getEventName());
+        assertEquals("天气", rsEventDtoList.get(3).getKeyWord());
 
 
     }
 
     @Test
     void should_return_bad_request_if_user_not_exist_when_add_rs_event() throws Exception {
-        RsEventDto rsEventDtoUserNotExist = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
-        String jsonUserNotExist = new ObjectMapper().writeValueAsString(rsEventDtoUserNotExist);
+        RsEventDto rsEventDtoUserNotExist = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDtoNew).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(USE_ANNOTATIONS, false);
+        String jsonUserNotExist = objectMapper.writeValueAsString(rsEventDtoUserNotExist);
+
+
         mockMvc.perform(post("/rs/event").content(jsonUserNotExist).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
             List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
-            assertEquals(0, rsEventDtoList.size());
+            assertEquals(3, rsEventDtoList.size());
 
     }
 
     @Test
     void should_update_rs_event() throws Exception {
         userRepository.save(userDto);
-
         RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
         rsEventRepository.save(rsEventDto);
 
