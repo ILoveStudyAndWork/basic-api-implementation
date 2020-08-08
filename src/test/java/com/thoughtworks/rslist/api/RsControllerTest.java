@@ -85,7 +85,7 @@ class RsControllerTest {
                 .voteNum(0).build();
         rsEventDto2 = RsEventDto.builder()
                 .keyWord("no type")
-                .eventName("The Second rs event")
+                .eventName("The second rs event")
                 .user(userDto)
                 .voteNum(0).build();
         rsEventDto3 = RsEventDto.builder()
@@ -191,15 +191,15 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName",is("The first rs event")))
-                .andExpect(jsonPath("$[0].keyWord",is("not type")))
+                .andExpect(jsonPath("$[0].keyWord",is("no type")))
                 .andExpect(jsonPath("$[0].id",is(rsEventDto1.getId())))
                 .andExpect(jsonPath("$[0].voteNum",is(0)))
-                .andExpect(jsonPath("$[1].eventName",is("The Second rs event")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")))
+                .andExpect(jsonPath("$[1].eventName",is("The second rs event")))
+                .andExpect(jsonPath("$[1].keyWord",is("no type")))
                 .andExpect(jsonPath("$[1].id",is(rsEventDto2.getId())))
                 .andExpect(jsonPath("$[1].voteNum",is(0)))
                 .andExpect(jsonPath("$[2].eventName",is("The third rs event")))
-                .andExpect(jsonPath("$[2].keyWord",is("not type")))
+                .andExpect(jsonPath("$[2].keyWord",is("no type")))
                 .andExpect(jsonPath("$[2].id",is(rsEventDto3.getId())))
                 .andExpect(jsonPath("$[2].voteNum",is(0)))
                 .andExpect(jsonPath("$[2]",not(hasKey("user"))));
@@ -210,18 +210,18 @@ class RsControllerTest {
         mockMvc.perform(get("/rs/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName",is("The first rs event")))
-                .andExpect(jsonPath("$.keyWord",is("not type")))
+                .andExpect(jsonPath("$.keyWord",is("no type")))
                 .andExpect(jsonPath("$",not(hasKey("user"))));
 
         mockMvc.perform(get("/rs/2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.eventName",is("The Second rs event")))
-                .andExpect(jsonPath("$.keyWord",is("not type")))
+                .andExpect(jsonPath("$.eventName",is("The second rs event")))
+                .andExpect(jsonPath("$.keyWord",is("no type")))
                 .andExpect(jsonPath("$",not(hasKey("user"))));
         mockMvc.perform(get("/rs/3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.eventName",is("The third rs event")))
-                .andExpect(jsonPath("$.keyWord",is("not type")))
+                .andExpect(jsonPath("$.keyWord",is("no type")))
                 .andExpect(jsonPath("$",not(hasKey("user"))));
     }
 
@@ -231,17 +231,17 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName",is("The first rs event")))
-                .andExpect(jsonPath("$[0].keyWord",is("not type")))
-                .andExpect(jsonPath("$[1].eventName",is("The Second rs event")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")));
+                .andExpect(jsonPath("$[0].keyWord",is("no type")))
+                .andExpect(jsonPath("$[1].eventName",is("The second rs event")))
+                .andExpect(jsonPath("$[1].keyWord",is("no type")));
 
         mockMvc.perform(get("/rs/list?start=2&end=3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(2)))
-                .andExpect(jsonPath("$[0].eventName",is("The Second rs event")))
-                .andExpect(jsonPath("$[0].keyWord",is("not type")))
+                .andExpect(jsonPath("$[0].eventName",is("The second rs event")))
+                .andExpect(jsonPath("$[0].keyWord",is("no type")))
                 .andExpect(jsonPath("$[1].eventName",is("The third rs event")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")));
+                .andExpect(jsonPath("$[1].keyWord",is("no type")));
     }
 
     @Test
@@ -255,11 +255,11 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(4)))
                 .andExpect(jsonPath("$[0].eventName",is("The first rs event")))
-                .andExpect(jsonPath("$[0].keyWord",is("not type")))
-                .andExpect(jsonPath("$[1].eventName",is("The Second rs event")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")))
+                .andExpect(jsonPath("$[0].keyWord",is("no type")))
+                .andExpect(jsonPath("$[1].eventName",is("The second rs event")))
+                .andExpect(jsonPath("$[1].keyWord",is("no type")))
                 .andExpect(jsonPath("$[2].eventName",is("The third rs event")))
-                .andExpect(jsonPath("$[2].keyWord",is("not type")))
+                .andExpect(jsonPath("$[2].keyWord",is("no type")))
                 .andExpect(jsonPath("$[3].eventName",is("牛肉涨价了")))
                 .andExpect(jsonPath("$[3].keyWord",is("经济")));
     }
@@ -278,10 +278,10 @@ class RsControllerTest {
                 .andExpect(jsonPath("$",hasSize(3)))
                 .andExpect(jsonPath("$[0].eventName",is("月全食出现")))
                 .andExpect(jsonPath("$[0].keyWord",is("天文")))
-                .andExpect(jsonPath("$[1].eventName",is("The Second rs event")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")))
+                .andExpect(jsonPath("$[1].eventName",is("The second rs event")))
+                .andExpect(jsonPath("$[1].keyWord",is("no type")))
                 .andExpect(jsonPath("$[2].eventName",is("The third rs event")))
-                .andExpect(jsonPath("$[2].keyWord",is("not type")));
+                .andExpect(jsonPath("$[2].keyWord",is("no type")));
 
 
         RsEvent rsEventEnt = new RsEvent(null,"乘风破浪的姐姐开播",user);
@@ -295,9 +295,9 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName",is("月全食出现")))
                 .andExpect(jsonPath("$[0].keyWord",is("天文")))
                 .andExpect(jsonPath("$[1].eventName",is("乘风破浪的姐姐开播")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")))
+                .andExpect(jsonPath("$[1].keyWord",is("no type")))
                 .andExpect(jsonPath("$[2].eventName",is("The third rs event")))
-                .andExpect(jsonPath("$[2].keyWord",is("not type")));
+                .andExpect(jsonPath("$[2].keyWord",is("no type")));
 
         RsEvent rsEventTech = new RsEvent("科技",null,user);
         String addEventTech = objectMapper.writeValueAsString(rsEventTech);
@@ -310,7 +310,7 @@ class RsControllerTest {
                 .andExpect(jsonPath("$[0].eventName",is("月全食出现")))
                 .andExpect(jsonPath("$[0].keyWord",is("天文")))
                 .andExpect(jsonPath("$[1].eventName",is("乘风破浪的姐姐开播")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")))
+                .andExpect(jsonPath("$[1].keyWord",is("no type")))
                 .andExpect(jsonPath("$[2].eventName",is("The third rs event")))
                 .andExpect(jsonPath("$[2].keyWord",is("科技")));
 
@@ -324,9 +324,9 @@ class RsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName",is("The first rs event")))
-                .andExpect(jsonPath("$[0].keyWord",is("not type")))
-                .andExpect(jsonPath("$[1].eventName",is("The Second rs event")))
-                .andExpect(jsonPath("$[1].keyWord",is("not type")));
+                .andExpect(jsonPath("$[0].keyWord",is("no type")))
+                .andExpect(jsonPath("$[1].eventName",is("The second rs event")))
+                .andExpect(jsonPath("$[1].keyWord",is("no type")));
 
     }
 

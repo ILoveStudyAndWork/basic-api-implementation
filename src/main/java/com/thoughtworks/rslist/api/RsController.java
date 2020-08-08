@@ -36,16 +36,16 @@ public class RsController {
 
   @GetMapping("/rs/{index}")
   public ResponseEntity getRsEvent(@PathVariable int index){
-    if (index < 1 || index > rsList.size()){
+    if (index < 1 || index > rsEventService.getRsList().size()){
           throw new RsEventNotValidException("invalid index");
     }
-    return ResponseEntity.ok(rsList.get(index-1));
+    return ResponseEntity.ok(rsEventService.getRsList().get(index-1));
   }
 
   @GetMapping("/rs/list")
   public ResponseEntity getRsEvent(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
     if (start != null && end != null){
-        if (start < 1 || end > rsList.size()){
+        if (start < 1 || end > rsEventService.getRsList().size()){
           throw new RequestNotValidException("invalid request param");
         }
       return ResponseEntity.ok(rsEventService.getRsList().subList(start-1,end));
