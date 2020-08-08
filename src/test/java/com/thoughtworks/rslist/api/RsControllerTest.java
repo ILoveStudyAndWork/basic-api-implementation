@@ -9,6 +9,7 @@ import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.dto.RsEventDto;
 import com.thoughtworks.rslist.dto.UserDto;
 import com.thoughtworks.rslist.dto.VoteDto;
+import com.thoughtworks.rslist.fonteddata.RsEventForModify;
 import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
@@ -57,6 +58,10 @@ class RsControllerTest {
 
     @BeforeEach
     void setUp(){
+        rsEventRepository.deleteAll();
+        userRepository.deleteAll();
+        voteRepository.deleteAll();
+
         userDto = UserDto.builder()
                 .userName("xiaoming")
                 .age(20)
@@ -74,17 +79,17 @@ class RsControllerTest {
                 .voteNum(10)
                 .build();
         rsEventDto1 = RsEventDto.builder()
-                .keyWord("not type")
+                .keyWord("no type")
                 .eventName("The first rs event")
                 .user(userDto)
                 .voteNum(0).build();
         rsEventDto2 = RsEventDto.builder()
-                .keyWord("not type")
+                .keyWord("no type")
                 .eventName("The Second rs event")
                 .user(userDto)
                 .voteNum(0).build();
         rsEventDto3 = RsEventDto.builder()
-                .keyWord("not type")
+                .keyWord("no type")
                 .eventName("The third rs event")
                 .user(userDto)
                 .voteNum(0).build();
@@ -142,50 +147,42 @@ class RsControllerTest {
 
     @Test
     void should_update_rs_event() throws Exception {
-        userRepository.save(userDto);
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
-        rsEventRepository.save(rsEventDto);
-
+        //RsEventForModify message = RsEventForModify.builder().eventName("乘风破浪的姐姐更新").keyWord("娱乐").userId(1).build();
         String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\",\"userId\":\"1\"}";
-        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
+
+        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto1.getId()).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(1,rsEventDtoList.size());
+        assertEquals(3,rsEventDtoList.size());
         assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
+        assertEquals("乘风破浪的姐姐更新", rsEventDtoList.get(0).getEventName());
     }
 
     @Test
     void should_return_bad_request_when_send_no_event_id_to_update_rs_event() throws Exception {
-        userRepository.save(userDto);
-
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
-        rsEventRepository.save(rsEventDto);
-
         String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\"}";
-        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/{rsEventId}",1).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void should_only_update_the_param_not_null_in_request_body_when_update_event() throws Exception {
-        userRepository.save(userDto);
-        RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
-        rsEventRepository.save(rsEventDto);
         String jsonUpDateKeyWord = "{\"keyword\":\"娱乐\",\"userId\":\"1\"}";
-        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonUpDateKeyWord).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto1.getId()).content(jsonUpDateKeyWord).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(1,rsEventDtoList.size());
+        assertEquals(3,rsEventDtoList.size());
         assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
+        assertEquals("The first rs event", rsEventDtoList.get(0).getEventName());
 
         String jsonUpDateEventName = "{\"eventName\":\"乘风破浪的姐姐更新\",\"userId\":\"1\"}";
-        mockMvc.perform(patch("/rs/{rsEventId}",2).content(jsonUpDateEventName).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto2.getId()).content(jsonUpDateEventName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(1,rsEventDtoList.size());
-        assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
-        assertEquals("乘风破浪的姐姐更新", rsEventDtoList.get(0).getEventName());
+        assertEquals(3,rsEventDtoList.size());
+        assertEquals("no type", rsEventDtoList.get(1).getKeyWord());
+        assertEquals("乘风破浪的姐姐更新", rsEventDtoList.get(1).getEventName());
     }
 
     @Test

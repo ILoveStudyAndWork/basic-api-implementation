@@ -68,43 +68,25 @@ public class RsController {
   @PatchMapping("/rs/{rsEventId}")
   public ResponseEntity patchRsEvent(@PathVariable int rsEventId
                                     ,@RequestBody String jsonEvent) throws JsonProcessingException {
-
     Map<String, String> map = new ObjectMapper().readValue(jsonEvent, Map.class);
     String eventName = map.get("eventName");
-
     String keyword = map.get("keyword");
     String userId = map.get("userId");
     if (userId == null){
       return ResponseEntity.badRequest().build();
     }
-    //read the userId by rsEvent
-    Optional<RsEventDto> rsEventDtoToBePatch = rsEventRepository.findById(rsEventId);
-    if (rsEventDtoToBePatch.isPresent()) {
-      int userIdInRsEvent = rsEventDtoToBePatch.get().getUser().getId();
-      String eventNameInRsEvent = rsEventDtoToBePatch.get().getEventName();
-      String keyWordInRsEvent = rsEventDtoToBePatch.get().getKeyWord();
-      if (eventName == null){
-        eventName = eventNameInRsEvent;
+    RsEventDto rsEventDtoToBePatch = rsEventRepository.findById(rsEventId).get();
+    if (rsEventDtoToBePatch !=null && rsEventDtoToBePatch.getUser().getId()==Integer.valueOf(userId)) {
+      if (eventName != null){
+        rsEventDtoToBePatch.setEventName(eventName);
       }
-      if (keyword == null){
-        keyword = keyWordInRsEvent;
+      if (keyword != null){
+        rsEventDtoToBePatch.setKeyWord(keyword);
       }
-      if (userIdInRsEvent == Integer.valueOf(userId)) {
-        //update
-        RsEventDto rsEventDto = RsEventDto.builder()
-                .eventName(eventName)
-                .keyWord(keyword)
-                .id(2)
-                .user(rsEventDtoToBePatch
-                        .get()
-                        .getUser())
-                .build();
-        rsEventRepository.save(rsEventDto);
-        return ResponseEntity.created(null).build();
-      }
-    }
+      rsEventRepository.save(rsEventDtoToBePatch);
       return ResponseEntity.created(null).build();
-
+   }
+      return ResponseEntity.created(null).build();
   }
 
 
