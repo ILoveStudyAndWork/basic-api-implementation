@@ -37,7 +37,8 @@ public class RsEventDto {
     @JsonBackReference
     @Getter(onMethod = @__( @JsonIgnore))
     @Setter(onMethod = @__( @JsonProperty))
-    @ManyToOne(cascade = CascadeType.REMOVE)
+
+    @ManyToOne
     private UserDto user;
 
 

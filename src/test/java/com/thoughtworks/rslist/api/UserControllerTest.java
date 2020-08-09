@@ -127,7 +127,7 @@ class UserControllerTest {
         List<UserDto> userList = userRepository.findAll();
         assertEquals(0,userList.size());
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(0,userList.size());
+        assertEquals(0,rsEventDtoList.size());
     }
     @Test
     void should_return_bad_request_when_fail_to_delete_user_by_id() throws Exception {

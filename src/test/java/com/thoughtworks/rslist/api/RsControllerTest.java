@@ -56,9 +56,6 @@ class RsControllerTest {
     RsEventDto rsEventDto2;
     RsEventDto rsEventDto3;
 
-    boolean isEventListEmpty(){
-        return rsEventRepository.findAll().isEmpty();
-    }
     @BeforeEach
     void setUp(){
         userDto = UserDto.builder()
@@ -93,8 +90,8 @@ class RsControllerTest {
                 .user(userDto)
                 .voteNum(0).build();
         rsEventDto = RsEventDto.builder()
-                .keyWord("娱乐")
-                .eventName("乘风破浪的姐姐更新了")
+                .keyWord("体育")
+                .eventName("北京广东半决赛")
                 .user(userDto)
                 .voteNum(100).build();
         userRepository.save(userDto);
@@ -144,42 +141,58 @@ class RsControllerTest {
 
     @Test
     void should_update_rs_event() throws Exception {
-        //RsEventForModify message = RsEventForModify.builder().eventName("乘风破浪的姐姐更新").keyWord("娱乐").userId(1).build();
-        String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\",\"userId\":\"1\"}";
+        rsEventRepository.save(rsEventDto);
+        RsEventForModify messageObject = RsEventForModify.builder().eventName("乘风破浪的姐姐更新").keyWord("娱乐").userId(userDto.getId()).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String eventMessage = objectMapper.writeValueAsString(messageObject);
 
-        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto1.getId()).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessage).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(3,rsEventDtoList.size());
-        assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
-        assertEquals("乘风破浪的姐姐更新", rsEventDtoList.get(0).getEventName());
+        assertEquals(4,rsEventDtoList.size());
+        assertEquals("娱乐", rsEventDtoList.get(3).getKeyWord());
+        assertEquals("乘风破浪的姐姐更新", rsEventDtoList.get(3).getEventName());
     }
 
     @Test
     void should_return_bad_request_when_send_no_event_id_to_update_rs_event() throws Exception {
-        String jsonRsEvent = "{\"eventName\":\"乘风破浪的姐姐更新\",\"keyword\":\"娱乐\"}";
-        mockMvc.perform(patch("/rs/{rsEventId}",1).content(jsonRsEvent).contentType(MediaType.APPLICATION_JSON))
+        rsEventRepository.save(rsEventDto);
+        RsEventForModify messageObject = RsEventForModify.builder().eventName("乘风破浪的姐姐更新").keyWord("娱乐").build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String eventMessage = objectMapper.writeValueAsString(messageObject);
+        mockMvc.perform(patch("/rs/{rsEventId}",1).content(eventMessage).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void should_only_update_the_param_not_null_in_request_body_when_update_event() throws Exception {
-        String jsonUpDateKeyWord = "{\"keyword\":\"娱乐\",\"userId\":\"1\"}";
-        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto1.getId()).content(jsonUpDateKeyWord).contentType(MediaType.APPLICATION_JSON))
+    void should_only_update_keyword_when_update_event_giving_event_name_empty() throws Exception {
+        rsEventRepository.save(rsEventDto);
+        RsEventForModify messageNoEventName = RsEventForModify.builder().keyWord("音乐").userId(userDto.getId()).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String eventMessageNoEventName = objectMapper.writeValueAsString(messageNoEventName);
+        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessageNoEventName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(3,rsEventDtoList.size());
-        assertEquals("娱乐", rsEventDtoList.get(0).getKeyWord());
-        assertEquals("The first rs event", rsEventDtoList.get(0).getEventName());
+        assertEquals(4,rsEventDtoList.size());
+        assertEquals("音乐", rsEventDtoList.get(3).getKeyWord());
+        assertEquals("北京广东半决赛", rsEventDtoList.get(3).getEventName());
 
-        String jsonUpDateEventName = "{\"eventName\":\"乘风破浪的姐姐更新\",\"userId\":\"1\"}";
-        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto2.getId()).content(jsonUpDateEventName).contentType(MediaType.APPLICATION_JSON))
+
+    }
+
+    @Test
+    void should_only_update_event_name_when_update_event_giving_keyword_empty() throws Exception {
+        rsEventRepository.save(rsEventDto);
+        RsEventForModify messageNoEventName = RsEventForModify.builder().eventName("新裤子乐队").userId(userDto.getId()).build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String eventMessageNoEventName = objectMapper.writeValueAsString(messageNoEventName);
+        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessageNoEventName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
-        rsEventDtoList = rsEventRepository.findAll();
-        assertEquals(3,rsEventDtoList.size());
-        assertEquals("no type", rsEventDtoList.get(1).getKeyWord());
-        assertEquals("乘风破浪的姐姐更新", rsEventDtoList.get(1).getEventName());
+        List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
+        assertEquals(4,rsEventDtoList.size());
+        assertEquals("体育", rsEventDtoList.get(3).getKeyWord());
+        assertEquals("新裤子乐队", rsEventDtoList.get(3).getEventName());
     }
 
     @Test
@@ -250,8 +263,12 @@ class RsControllerTest {
                 .andExpect(jsonPath("$",hasSize(2)))
                 .andExpect(jsonPath("$[0].eventName",is("The first rs event")))
                 .andExpect(jsonPath("$[0].keyWord",is("no type")))
+                .andExpect(jsonPath("$[0].id",is(rsEventDto1.getId())))
+                .andExpect(jsonPath("$[0].voteNum",is(0)))
                 .andExpect(jsonPath("$[1].eventName",is("The second rs event")))
-                .andExpect(jsonPath("$[1].keyWord",is("no type")));
+                .andExpect(jsonPath("$[1].keyWord",is("no type")))
+                .andExpect(jsonPath("$[1].id",is(rsEventDto2.getId())))
+                .andExpect(jsonPath("$[1].voteNum",is(0)));
 
     }
 
@@ -289,7 +306,6 @@ class RsControllerTest {
 
     @Test
     void should_throw_error_when_add_event_given_user_is_empty() throws Exception {
-        //difference between null and ""
         String eventJson =  "{\"eventName\":\"广东台风\",\"keyWord\":\"天气\"}";
         mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -299,7 +315,6 @@ class RsControllerTest {
 
     @Test
     void should_throw_error_when_add_event_given_user_is_not_null_but_invalid() throws Exception {
-        //difference between null and ""
         String eventJson =  "{\"eventName\":\"广东台风\",\"keyWord\":\"天气\",\"user\": {\"userName\":\"reporte444r\",\"age\": 19,\"gender\": \"male\",\"email\": \"a@b.com\",\"phone\": \"18888888888\",\"voteNum\":\"10\"}}";
         mockMvc.perform(post("/rs/event").content(eventJson).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())

@@ -57,4 +57,10 @@ public class RsEventService {
          rsList = rsEventRepository.findAll();
          return rsList;
     }
+
+    public void deleteByOrder(int order){
+        RsEventDto rsEventDto = getRsList().get(order-1);
+        int id = rsEventDto.getId();
+        rsEventRepository.deleteById(id);
+    }
 }
