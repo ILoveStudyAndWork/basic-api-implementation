@@ -41,12 +41,11 @@ public class User {
         this.voteNum = voteNum;
     }
 
-    //@JsonIgnore
+
     public String getUserName() {
         return userName;
     }
 
-    //@JsonProperty
     public void setUserName(String userName) {
         this.userName = userName;
     }

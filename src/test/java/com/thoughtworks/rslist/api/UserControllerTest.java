@@ -20,8 +20,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -34,7 +33,6 @@ class UserControllerTest {
     UserRepository userRepository;
     @Autowired
     RsEventRepository rsEventRepository;
-
 
     @BeforeEach
     void setUp(){
@@ -119,7 +117,7 @@ class UserControllerTest {
                 .user(userDto)
                 .build();
         rsEventRepository.save(rsEventDto);
-        mockMvc.perform(get("/user/{id}",userDto.getId()))
+        mockMvc.perform(delete("/user/{id}",userDto.getId()))
                 .andExpect(status().isCreated());
         List<UserDto> userList = userRepository.findAll();
         assertEquals(0,userList.size());
@@ -128,11 +126,9 @@ class UserControllerTest {
     }
     @Test
     void should_return_bad_request_when_fail_to_delete_user_by_id() throws Exception {
-        mockMvc.perform(get("/user/{id}",1))
+        mockMvc.perform(delete("/user/{id}",1))
                 .andExpect(status().isBadRequest());
-
     }
-
 
     @Test
     void user_name_length_should_less_than_8() throws Exception {
@@ -175,7 +171,6 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-
     @Test
     void get_user_list() throws Exception {
         User user = new User("abc","male",20,"abc@abc.com","18978654567",10);
@@ -197,6 +192,4 @@ class UserControllerTest {
 
 
     }
-
-
 }

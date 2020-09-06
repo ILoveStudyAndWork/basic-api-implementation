@@ -101,7 +101,6 @@ class RsControllerTest {
         userRepository.deleteAll();
         voteRepository.deleteAll();
     }
-    //
     @Test
     void should_add_rs_event_when_user_id_exist() throws Exception {
         RsEventDto rsEventDto = RsEventDto.builder().eventName("龙卷风").keyWord("天气").user(userDto).build();
@@ -141,7 +140,7 @@ class RsControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         String eventMessage = objectMapper.writeValueAsString(messageObject);
 
-        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessage).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessage).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
@@ -156,7 +155,7 @@ class RsControllerTest {
         RsEventForModify messageObject = RsEventForModify.builder().eventName("乘风破浪的姐姐更新").keyWord("娱乐").build();
         ObjectMapper objectMapper = new ObjectMapper();
         String eventMessage = objectMapper.writeValueAsString(messageObject);
-        mockMvc.perform(patch("/rs/{rsEventId}",1).content(eventMessage).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put("/rs/{rsEventId}",1).content(eventMessage).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
@@ -166,7 +165,7 @@ class RsControllerTest {
         RsEventForModify messageNoEventName = RsEventForModify.builder().keyWord("音乐").userId(userDto.getId()).build();
         ObjectMapper objectMapper = new ObjectMapper();
         String eventMessageNoEventName = objectMapper.writeValueAsString(messageNoEventName);
-        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessageNoEventName).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessageNoEventName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
         assertEquals(4,rsEventDtoList.size());
@@ -182,7 +181,7 @@ class RsControllerTest {
         RsEventForModify messageNoEventName = RsEventForModify.builder().eventName("新裤子乐队").userId(userDto.getId()).build();
         ObjectMapper objectMapper = new ObjectMapper();
         String eventMessageNoEventName = objectMapper.writeValueAsString(messageNoEventName);
-        mockMvc.perform(patch("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessageNoEventName).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(put("/rs/{rsEventId}",rsEventDto.getId()).content(eventMessageNoEventName).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
         assertEquals(4,rsEventDtoList.size());
@@ -251,7 +250,7 @@ class RsControllerTest {
 
     @Test
     public void delete_rs_event() throws Exception {
-        mockMvc.perform(get("/rs/delete?order=3"))
+        mockMvc.perform(delete("/rs/delete?order=3"))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/rs/list"))
                 .andExpect(status().isOk())
@@ -335,12 +334,11 @@ class RsControllerTest {
                 .voteNum(voteDto.getVoteNum())
                 .build());
 
-        mockMvc.perform(post("/rs/vote/{rsEventId}",rsEventDto.getId())
+        mockMvc.perform(put("/rs/vote/{rsEventId}",rsEventDto.getId())
                 .content(jsonVote)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
 
-        //check vote num for rs ,user ,voteD
         List<RsEventDto> rsEventDtoList = rsEventRepository.findAll();
         assertEquals(103,rsEventDtoList.get(3).getVoteNum());
         List<UserDto> userDtoList = userRepository.findAll();

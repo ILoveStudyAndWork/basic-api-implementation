@@ -34,7 +34,7 @@ public class VoteController {
 
 
     @GetMapping("/voteRecord")
-    public ResponseEntity<List<Vote>> getVoteRecord(@RequestParam int userId,@RequestParam int rsEventId){
+    public ResponseEntity<List<Vote>> list(@RequestParam int userId,@RequestParam int rsEventId){
         return ResponseEntity.ok(
                 voteRepository.findAllByUserIdAndRsEventId(userId,rsEventId).stream().map(
                         item-> Vote.builder().
@@ -47,7 +47,7 @@ public class VoteController {
     }
 
     @GetMapping("/voteRecordByTime")
-    public ResponseEntity<List<Vote>> getVoteRecordByTime(@RequestParam String startTime,
+    public ResponseEntity<List<Vote>> query(@RequestParam String startTime,
                                                           @RequestParam String endTime) throws ParseException, DateNotValidException {
         if (!theStringIsValidDate(startTime) || !theStringIsValidDate(endTime) ){
             throw new DateNotValidException("input time invalid:the format is not a date format");

@@ -44,15 +44,11 @@ public class UserDto {
 
     private int voteNum = 10;
 
-
     @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE,mappedBy = "user")
     private List<RsEventDto> rsEvent;
 
     @JsonIgnore
-    @OneToMany//(cascade = CascadeType.REMOVE,mappedBy = "user")
+    @OneToMany
     private List<VoteDto> vote;
-
-
-
 }

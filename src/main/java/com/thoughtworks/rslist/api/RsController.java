@@ -1,6 +1,5 @@
 package com.thoughtworks.rslist.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.dto.RsEventDto;
 import com.thoughtworks.rslist.exception.RequestNotValidException;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/rs")
 public class RsController {
   public static List<RsEventDto> rsList;
 
@@ -31,16 +31,16 @@ public class RsController {
 
   @Autowired
   RsEventService rsEventService;
-  @GetMapping("/rs/{index}")
-  public ResponseEntity getRsEventByIndex(@PathVariable int index){
+  @GetMapping("/{index}")
+  public ResponseEntity query(@PathVariable int index){
     if (index < 1 || index > rsEventService.getRsList().size()){
           throw new RsEventNotValidException("invalid index");
     }
     return ResponseEntity.ok(rsEventService.getRsList().get(index-1));
   }
 
-  @GetMapping("/rs/list")
-  public ResponseEntity getRsEvent(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
+  @GetMapping("/list")
+  public ResponseEntity list(@RequestParam(required = false) Integer start,@RequestParam(required = false) Integer end){
     if (start != null && end != null){
         if (start < 1 || end > rsEventService.getRsList().size()){
           throw new RequestNotValidException("invalid request param");
@@ -50,8 +50,8 @@ public class RsController {
     return ResponseEntity.ok(rsEventService.getRsList());
   }
 
-  @PostMapping("/rs/event")
-  public ResponseEntity addRsEvent(@RequestBody @Valid RsEventDto rsEventDto) throws Exception{
+  @PostMapping("/event")
+  public ResponseEntity create(@RequestBody @Valid RsEventDto rsEventDto) throws Exception{
     if (userRepository.findById(rsEventDto.getUser().getId()).isPresent()){
       rsEventRepository.save(rsEventDto);
       return ResponseEntity.created(null).build();
@@ -61,9 +61,9 @@ public class RsController {
   }
 
 
-  @PatchMapping("/rs/{rsEventId}")
-  public ResponseEntity patchRsEvent(@PathVariable int rsEventId
-                                    ,@RequestBody RsEventForModify rsEventForModify) throws JsonProcessingException {
+  @PutMapping("/{rsEventId}")
+  public ResponseEntity update(@PathVariable int rsEventId,
+                               @RequestBody RsEventForModify rsEventForModify) {
     int userId = rsEventForModify.getUserId();
     String eventName = rsEventForModify.getEventName();
     String keyword = rsEventForModify.getKeyWord();
@@ -89,8 +89,8 @@ public class RsController {
 
 
 
-  @PostMapping("/rs/vote/{rsEventId}")
-  public ResponseEntity voteWithEventId (@PathVariable int rsEventId, @RequestBody Vote vote) throws Exception {
+  @PutMapping("/vote/{rsEventId}")
+  public ResponseEntity updateVote (@PathVariable int rsEventId, @RequestBody Vote vote) throws Exception {
     int remainVoteNum = userRepository.findById(vote.getUserId()).get().getVoteNum();
     if(remainVoteNum < vote.getVoteNum()){
       return ResponseEntity.badRequest().build();
@@ -99,13 +99,12 @@ public class RsController {
     return ResponseEntity.created(null).build();
   }
 
-  @GetMapping("/rs/delete")
-  public ResponseEntity deleteRsEvent(@RequestParam int order){
+  @DeleteMapping("/delete")
+  public ResponseEntity delete(@RequestParam int order){
     if (order > rsEventService.getRsList().size() || order < 0){
       throw new RequestNotValidException("invalid request param");
     }
     rsEventService.deleteByOrder(order);
-    List<RsEventDto> rsEventDtos = rsEventRepository.findAll();
     return ResponseEntity.ok(null);
   }
 

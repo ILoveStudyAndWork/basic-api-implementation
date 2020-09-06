@@ -17,8 +17,8 @@ public class UserController {
     UserRepository userRepository;
 
 
-    @RequestMapping("/user")
-    public ResponseEntity registerUser(@RequestBody  UserDto userDto){
+    @PostMapping("/user")
+    public ResponseEntity create(@RequestBody  UserDto userDto){
         Optional<UserDto> userDtoOptional = userRepository.findById(userDto.getId());
         if (!userDtoOptional.isPresent()){
             userRepository.save(userDto);
@@ -31,13 +31,13 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity getUserList(@RequestParam String userId){
+    public ResponseEntity list(@RequestParam String userId){
         Optional<UserDto> userDto = userRepository.findById(Integer.valueOf(userId));
         return ResponseEntity.ok(userDto);
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity deleteUserById(@PathVariable int id){
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity delete(@PathVariable int id){
         Optional<UserDto> userDtoOptional = userRepository.findById(id);
         if (userDtoOptional.isPresent()){
             userRepository.deleteById(id);
