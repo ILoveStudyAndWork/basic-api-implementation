@@ -2,12 +2,8 @@ package com.thoughtworks.rslist.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.thoughtworks.rslist.valid.Validate1;
-import com.thoughtworks.rslist.valid.Validate2;
 
-import javax.validation.GroupSequence;
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 

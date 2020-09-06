@@ -30,10 +30,10 @@ public class VoteDto {
 
     @JsonIgnore
     @JsonBackReference
-    @ManyToOne//(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private UserDto user;
 
     @JsonIgnore
-    @ManyToOne//(cascade = CascadeType.REMOVE)
+    @ManyToOne
     private RsEventDto rsEvent;
 }

@@ -1,6 +1,5 @@
 package com.thoughtworks.rslist.api;
 
-import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
 import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.dto.VoteDto;
 import com.thoughtworks.rslist.exception.DateNotValidException;
@@ -13,10 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.xml.crypto.Data;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -24,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.zip.DataFormatException;
 
 @RestController
 public class VoteController {

@@ -1,12 +1,8 @@
 package com.thoughtworks.rslist.api;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.thoughtworks.rslist.domain.RsEvent;
 import com.thoughtworks.rslist.domain.Vote;
 import com.thoughtworks.rslist.dto.RsEventDto;
-import com.thoughtworks.rslist.dto.UserDto;
-import com.thoughtworks.rslist.dto.VoteDto;
 import com.thoughtworks.rslist.exception.RequestNotValidException;
 import com.thoughtworks.rslist.exception.RsEventNotValidException;
 import com.thoughtworks.rslist.fonteddata.RsEventForModify;
@@ -14,14 +10,12 @@ import com.thoughtworks.rslist.repository.RsEventRepository;
 import com.thoughtworks.rslist.repository.UserRepository;
 import com.thoughtworks.rslist.repository.VoteRepository;
 import com.thoughtworks.rslist.service.RsEventService;
-import jdk.nashorn.internal.objects.annotations.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -34,9 +28,9 @@ public class RsController {
   UserRepository userRepository;
   @Autowired
   VoteRepository voteRepository;
+
   @Autowired
   RsEventService rsEventService;
-
   @GetMapping("/rs/{index}")
   public ResponseEntity getRsEventByIndex(@PathVariable int index){
     if (index < 1 || index > rsEventService.getRsList().size()){
